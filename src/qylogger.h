@@ -11,6 +11,7 @@
 #include <QTextStream>
 #include <QThread>
 #include <QtGlobal>
+#include <qglobal.h>
 
 // Log levels
 enum LogLevel
@@ -117,17 +118,17 @@ inline void outputMessage(QtMsgType type, const QMessageLogContext& context, con
     }
 
     // Format message
+    QString tid = QString("%1").arg(quintptr(QThread::currentThreadId()));
     QString filePath = QString::fromUtf8(context.file);
     QString fileName = QFileInfo(filePath).fileName();
-    int lineNumber = context.line;
-    QString tid = QString("%1").arg(quintptr(QThread::currentThreadId()));
-    QString formattedMessage =
-        QString("[%1] [%2:%3] %4").arg(tid).arg(fileName).arg(lineNumber).arg(msg);
-    formattedMessage.prepend(QString("[%1] ").arg(levelStr));
-
-    QString current_date_time =
-        QString("[") + QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz") + QString("] ");
-    formattedMessage.prepend(current_date_time);
+    QString formattedMessage;
+    formattedMessage = QString("[%1] [%2] [%3] [%4:%5] %6")
+                           .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz"))
+                           .arg(levelStr)
+                           .arg(tid)
+                           .arg(fileName)
+                           .arg(context.line)
+                           .arg(msg);
 
     // Log file handling
     QDir dir(LOG_FILE_PATH);
@@ -145,11 +146,12 @@ inline void outputMessage(QtMsgType type, const QMessageLogContext& context, con
     {
         // Rotate logs
         QString lastLogName = QString("%1%2.%3.log")
-                               .arg(LOG_FILE_PATH)
-                               .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd"))
-                               .arg(MAX_LOG_FILES);
+                                  .arg(LOG_FILE_PATH)
+                                  .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd"))
+                                  .arg(MAX_LOG_FILES);
         QFile lastLogFile(lastLogName);
-        if(lastLogFile.exists()){
+        if (lastLogFile.exists())
+        {
             lastLogFile.remove();
         }
         for (int i = MAX_LOG_FILES - 1; i > 0; i--)
@@ -208,4 +210,3 @@ inline void setup_logger(const QString& logFilePath, qint64 maxLogFileSize, int 
     // Install message handler
     qInstallMessageHandler(outputMessage);
 }
-

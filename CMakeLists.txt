@@ -13,7 +13,7 @@ file(GLOB_RECURSE SOURCES src/*.cpp)
 file(GLOB_RECURSE UIFILES src/*.ui)
 file(GLOB_RECURSE RCCFILES src/*.qrc)
 
-add_executable(${PROJECT_NAME} WIN32 ${HEADERS} ${SOURCES} ${UIFILES} ${RCCFILES})
+add_executable(${PROJECT_NAME} ${HEADERS} ${SOURCES} ${UIFILES} ${RCCFILES})
 
 find_package(Qt5)
 
